@@ -1,0 +1,13 @@
+# Ignore WordPress core files and sensitive data
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/debug.log
+
+# Ignore system files
+.htaccess
+*.log
+node_modules/
+vendor/
+.env
