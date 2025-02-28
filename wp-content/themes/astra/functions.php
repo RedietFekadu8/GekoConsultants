@@ -1,5 +1,18 @@
 <?php
 
+function handle_file_upload($file) {
+    if (isset($file) && !empty($file['name'])) {
+        $upload_dir = wp_upload_dir();
+        $target_dir = $upload_dir['path'] . '/';
+        $target_file = $target_dir . basename($file['name']);
+
+        if (move_uploaded_file($file['tmp_name'], $target_file)) {
+            return $upload_dir['url'] . '/' . basename($file['name']);
+        }
+    }
+    return false;
+}
+
 function save_appointment() {
     if (!isset($_POST['full_name']) || !isset($_POST['appointment_date'])) {
         wp_redirect(home_url('/appointment?error=missing_fields'));
@@ -21,17 +34,12 @@ function save_appointment() {
     $remark = esc_sql(sanitize_text_field($_POST['remark']));
     $date = esc_sql(sanitize_text_field($_POST['appointment_date']));
     
-    // File upload handling
-    $file_url = '';
-    if (!empty($_FILES['file_upload']['name'])) {
-        $file = $_FILES['file_upload'];
-        $upload_overrides = ['test_form' => false];
-
-        $uploaded_file = wp_handle_upload($file, $upload_overrides);
-        if (isset($uploaded_file['url'])) {
-            $file_url = esc_url_raw($uploaded_file['url']);
-        }
-    }
+    // Upload each file separately
+    $file_upload = handle_file_upload($_FILES['file_upload']);
+    $passport_upload = handle_file_upload($_FILES['passport_upload']);
+    $transcript_upload = handle_file_upload($_FILES['transcript_upload']);
+    $essay_upload = handle_file_upload($_FILES['essay_upload']);
+    $duolingo_upload = handle_file_upload($_FILES['duolingo_upload']);
 
     // Insert data into the database
     $inserted = $wpdb->insert($table_name, [
@@ -45,7 +53,11 @@ function save_appointment() {
         'state' => $state,
         'remark' => $remark,
         'appointment_date' => $date,
-        'file_upload' => $file_url,
+        'file_upload' => $file_upload,
+        'passport_upload' => $passport_upload,
+        'transcript_upload' => $transcript_upload,
+        'essay_upload' => $essay_upload,
+        'duolingo_upload' => $duolingo_upload,
 		
     ]);
 
@@ -65,6 +77,7 @@ function save_appointment() {
 	    wp_redirect(add_query_arg(['success' => 'true', 'appointment_id' => $appointment_id], wp_get_referer()));
     exit;
 }
+
 //     wp_redirect(home_url('/appointment?success=1'));
 //     exit;
 
@@ -395,4 +408,3 @@ function save_contact_message() {
 }
 add_action('admin_post_nopriv_save_contact_message', 'save_contact_message');
 add_action('admin_post_save_contact_message', 'save_contact_message');
-

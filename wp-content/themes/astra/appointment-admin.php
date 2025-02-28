@@ -59,19 +59,14 @@ function appointment_admin_page() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'appointmentss';
 
-    // Date Filtering
-    $where_clause = '';
-    if (!empty($_GET['filter_date'])) {
-        $filter_date = sanitize_text_field($_GET['filter_date']);
-        $where_clause = $wpdb->prepare("WHERE appointment_date = %s", $filter_date);
-    }
 
-    // Fetch filtered appointments
-    $appointments = $wpdb->get_results("SELECT * FROM $table_name $where_clause ORDER BY id DESC");
+    // Fetch all appointments
+    $appointments = $wpdb->get_results("SELECT * FROM $table_name ORDER BY id DESC");
 
+    // Display messages
     echo '<div class="wrap"><h1>Appointments</h1>';
 
-    // Success message
+    
     if (isset($_GET['deleted'])) {
         echo '<div class="updated"><p>Appointment deleted successfully.</p></div>';
     }
@@ -87,7 +82,7 @@ function appointment_admin_page() {
     // Export Button
     echo '<a href="' . admin_url('admin.php?page=appointments&export_csv=1') . '" class="button button-primary">Export to CSV</a>';
 
-    // Display table
+    // Display Appointments Table
     echo '<table class="wp-list-table widefat fixed striped">';
     echo '<thead>
             <tr>
@@ -96,7 +91,12 @@ function appointment_admin_page() {
                 <th>Phone</th>
                 <th>Email</th>
                 <th>Date</th>
-                <th>File</th>
+                <th>Payment</th>
+                <th>Passport</th>
+                <th>Transcript</th>
+                <th>Essay</th>
+                <th>Duolingo</th>
+                
                 <th>Actions</th>
             </tr>
           </thead>';
@@ -112,9 +112,37 @@ function appointment_admin_page() {
                     <td>' . esc_html($appointment->appointment_date) . '</td>
                     <td>';
             if (!empty($appointment->file_upload)) {
-                echo '<a href="' . esc_url($appointment->file_upload) . '" target="_blank">Download</a>';
+                echo '<a href="' . esc_url($appointment->file_upload) . '" target="_blank">View Payment</a>';
             } else {
                 echo 'No File';
+            }
+            echo '</td>
+                    <td>';
+            if (!empty($appointment->passport_upload)) {
+                echo '<a href="' . esc_url($appointment->passport_upload) . '" target="_blank">View Passport</a>';
+            } else {
+                echo 'No Passport';
+            }
+            echo '</td>
+                    <td>';
+            if (!empty($appointment->transcript_upload)) {
+                echo '<a href="' . esc_url($appointment->transcript_upload) . '" target="_blank">View Transcript</a>';
+            } else {
+                echo 'No Transcript';
+            }
+            echo '</td>
+                    <td>';
+            if (!empty($appointment->essay_upload)) {
+                echo '<a href="' . esc_url($appointment->essay_upload) . '" target="_blank">View Essay</a>';
+            } else {
+                echo 'No Essay';
+            }
+            echo '</td>
+                    <td>';
+            if (!empty($appointment->duolingo_upload)) {
+                echo '<a href="' . esc_url($appointment->duolingo_upload) . '" target="_blank">View Duolingo</a>';
+            } else {
+                echo 'No Duolingo';
             }
             echo '</td>
                     <td>
@@ -125,6 +153,5 @@ function appointment_admin_page() {
     } else {
         echo '<tr><td colspan="7">No appointments found.</td></tr>';
     }
-
     echo '</tbody></table></div>';
 }

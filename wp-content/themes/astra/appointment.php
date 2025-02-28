@@ -103,158 +103,52 @@ get_header();
 </script>
     </div>
 
-<div style="margin-bottom: 20px;">
-    <label for="document_upload[]" style="font-size: 1.1rem; margin-bottom: 8px;">
+<div style="display: flex; flex-wrap: wrap; gap: 20px;">
+	 <label for="document_upload" style="font-size: 1.1rem; margin-bottom: 8px;">
         Required Documents (Full Package) Mandatory
     </label>
     <br>
-    <span style="font-size: 1rem; color: #333;">Passport <span style="color: red;">*</span></span>
-    <br>
-    <span style="font-size: 1rem; color: #333;">Transcript <span style="color: red;">*</span></span>
-    <br>
-    <span style="font-size: 1rem; color: #333;">Personal Essay <span style="color: red;">*</span></span>
-    <br>
-    <p style="font-size: 1.1rem;">
-        Standardized Exam (Duolingo) <span style="color: red;">*</span>
-    </p>
+    <div style="flex: 1; min-width: 250px;">
+        <label for="passport_upload" style="font-size: 1.1rem; margin-bottom: 8px; display: block;">
+            Passport <span style="color: red;">*</span>
+        </label>
+        <input type="file" id="passport_upload" name="passport_upload" style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+        <div id="filePreviewContainer_1" style="margin-top: 10px;"></div>
+    </div>
 
-    <input type="file" id="document_upload" name="document_upload[]" 
-           style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;" 
-           multiple accept=".jpg,.jpeg,.png,.pdf">
+    <div style="flex: 1; min-width: 250px;">
+        <label for="transcript_upload" style="font-size: 1.1rem; margin-bottom: 8px; display: block;">
+            Transcript <span style="color: red;">*</span>
+        </label>
+        <input type="file" id="transcript_upload" name="transcript_upload" style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+        <div id="filePreviewContainer_2" style="margin-top: 10px;"></div>
+    </div>
 
-    <p id="fileLimitMsg" style="color: red; display: none; font-size: 1rem;">
-        You can upload a maximum of 4 files.
-    </p>
+    <div style="flex: 1; min-width: 250px;">
+        <label for="essay_upload" style="font-size: 1.1rem; margin-bottom: 8px; display: block;">
+            Personal Essay <span style="color: red;">*</span>
+        </label>
+        <input type="file" id="essay_upload" name="essay_upload" style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+        <div id="filePreviewContainer_3" style="margin-top: 10px;"></div>
+    </div>
 
-    <div id="filePreviewContainer" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;"></div>
+    <div style="flex: 1; min-width: 250px;">
+        <label for="duolingo_upload" style="font-size: 1.1rem; margin-bottom: 8px; display: block;">
+            Standardized Exam(Duolingo) <span style="color: red;">*</span>
+        </label>
+        <input type="file" id="duolingo_upload" name="duolingo_upload" style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
+        <div id="filePreviewContainer_4" style="margin-top: 10px;"></div>
+    </div>
 </div>
-
-<script>
-let selectedFiles = []; // Store all selected files
-
-document.getElementById("document_upload").addEventListener("change", function (event) {
-    let fileInput = event.target;
-    let fileLimitMsg = document.getElementById("fileLimitMsg");
-    let filePreviewContainer = document.getElementById("filePreviewContainer");
-
-    let newFiles = Array.from(fileInput.files); // Get newly selected files
-
-    // Prevent duplicates and keep previous selections
-    newFiles.forEach(file => {
-        if (!selectedFiles.some(f => f.name === file.name)) {
-            selectedFiles.push(file);
-        }
-    });
-
-    // Check file count limit
-    if (selectedFiles.length > 4) {
-        fileLimitMsg.style.display = "block";
-        selectedFiles = selectedFiles.slice(0, 4); // Keep only first 4 files
-    } else {
-        fileLimitMsg.style.display = "none";
-    }
-
-    filePreviewContainer.innerHTML = ""; // Clear previous preview
-    selectedFiles.forEach((file, index) => {
-        let fileBox = document.createElement("div");
-        fileBox.style.cssText = "width: 100px; height: 100px; border: 2px solid #ccc; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; text-align: center; font-size: 12px; position: relative;";
-
-        let fileIcon = document.createElement("img");
-        fileIcon.style.cssText = "width: 50px; height: 50px; object-fit: cover; margin-bottom: 5px;";
-        
-        if (file.type.startsWith("image/")) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                fileIcon.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            fileIcon.src = "https://cdn-icons-png.flaticon.com/512/337/337946.png"; // Generic document icon
-        }
-
-        let fileName = document.createElement("span");
-        fileName.textContent = file.name.length > 10 ? file.name.substring(0, 10) + "..." : file.name;
-
-        let removeBtn = document.createElement("button");
-        removeBtn.innerHTML = "X";
-        removeBtn.style.cssText = "position: absolute; top: -8px; right: -8px; background-color: red; color: white; border: none; width: 20px; height: 20px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;";
-        removeBtn.onclick = () => removeFile(index);
-
-        fileBox.appendChild(fileIcon);
-        fileBox.appendChild(fileName);
-        fileBox.appendChild(removeBtn);
-
-        filePreviewContainer.appendChild(fileBox);
-    });
-
-    updateFileInput(); // Update the file input field
-});
-
-// Function to remove a file
-function removeFile(index) {
-    selectedFiles.splice(index, 1); // Remove selected file
-    updateFileInput(); // Update file input field
-}
-
-// Function to update file input after file removal
-function updateFileInput() {
-    let fileInput = document.getElementById("document_upload");
-    let dataTransfer = new DataTransfer();
-    let filePreviewContainer = document.getElementById("filePreviewContainer");
-
-    selectedFiles.forEach(file => dataTransfer.items.add(file));
-    fileInput.files = dataTransfer.files; // Update file input
-
-    filePreviewContainer.innerHTML = ""; // Clear previous preview
-    selectedFiles.forEach((file, index) => {
-        let fileBox = document.createElement("div");
-        fileBox.style.cssText = "width: 100px; height: 100px; border: 2px solid #ccc; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; text-align: center; font-size: 12px; position: relative;";
-
-        let fileIcon = document.createElement("img");
-        fileIcon.style.cssText = "width: 50px; height: 50px; object-fit: cover; margin-bottom: 5px;";
-        
-        if (file.type.startsWith("image/")) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                fileIcon.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        } else {
-            fileIcon.src = "https://cdn-icons-png.flaticon.com/512/337/337946.png"; // Generic document icon
-        }
-
-        let fileName = document.createElement("span");
-        fileName.textContent = file.name.length > 10 ? file.name.substring(0, 10) + "..." : file.name;
-
-        let removeBtn = document.createElement("button");
-        removeBtn.innerHTML = "X";
-        removeBtn.style.cssText = "position: absolute; top: -8px; right: -8px; background-color: red; color: white; border: none; width: 20px; height: 20px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;";
-        removeBtn.onclick = () => removeFile(index);
-
-        fileBox.appendChild(fileIcon);
-        fileBox.appendChild(fileName);
-        fileBox.appendChild(removeBtn);
-
-        filePreviewContainer.appendChild(fileBox);
-    });
-
-    // Enable input if files are less than 4
-    fileInput.disabled = selectedFiles.length >= 4;
-}
-</script>
-
-
+<br>
+	<br>
 
 
     <div style="margin-bottom: 20px;">
     <label for="file_upload" style="font-size: 1.1rem; margin-bottom: 8px;">Payment Upload File (Optional)</label>
     <br>
-    <span style="font-size: 1rem; color: #333; "> CBE: 100********* </span>
-    <br>
-		<span style="font-size: 1rem; color: #333; "> Awash: 100********* </span>
-    <br>
-		<span style="font-size: 1rem; color: #333; "> Abssinya: 100********* </span>
-    <br>
+    <span style="font-size: 1rem; color: #333; "> CBE: 1000243280862 </span>
+       <br>
 	<p style="font-size: 1.1rem; font-weight: bold;">Ezana Getachew</p>
     <input type="file" id="file_upload" name="file_upload" style="width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;">
 </div>
